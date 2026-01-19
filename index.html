@@ -1,44 +1,4 @@
-
-<!doctype html>
-<html lang="ms">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PENTADBIR CHAMPION PBS PAHANG</title>
-<style>
-body{font-family:Arial;margin:20px}
-input,select,button{width:100%;padding:10px;margin:6px 0}
-.card{border:1px solid #ddd;padding:15px;margin-bottom:15px}
-h3{margin-top:0}
-</style>
-</head>
-<body>
-
-<div class="card">
-<h3>ISI DATA</h3>
-<select id="ppd">
-<option value="">-- PPD --</option>
-<option>PPD Kuantan</option>
-<option>PPD Pekan</option>
-<option>PPD Temerloh</option>
-</select>
-
-<input id="sr" placeholder="Sekolah Rendah">
-<input id="gb" placeholder="Guru Besar">
-<input id="sm" placeholder="Sekolah Menengah">
-<input id="pg" placeholder="Pengetua">
-
-<button onclick="simpan()">SIMPAN</button>
-<div id="msg"></div>
-</div>
-
-<div class="card">
-<h3>DASHBOARD</h3>
-<div id="list">Loading…</div>
-</div>
-
 <script>
-  // ======= URL /exec tuan (yang betul) =======
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt5cE4h8orcUxy5B9R_vN4L6-3jfnSQXLQooQLCfs7Uvz277HvgByEElskezWgxKkEww/exec";
 
   let CACHE = [];
@@ -51,7 +11,7 @@ h3{margin-top:0}
     setTimeout(() => { msg.className = "msg"; }, 4000);
   }
 
-  // ========= (A) GET GUNA JSONP (TAK KENA CORS) =========
+  // JSONP GET (tak kena CORS)
   function apiGetAllJSONP(){
     return new Promise((resolve, reject) => {
       const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1000);
@@ -65,7 +25,7 @@ h3{margin-top:0}
       const script = document.createElement("script");
       script.onerror = () => {
         try { delete window[cb]; script.remove(); } catch(e){}
-        reject(new Error("Gagal muat data (JSONP error)."));
+        reject(new Error("Gagal muat data (JSONP)."));
       };
 
       script.src = `${WEB_APP_URL}?callback=${encodeURIComponent(cb)}&ts=${Date.now()}`;
@@ -73,10 +33,9 @@ h3{margin-top:0}
     });
   }
 
-  // ========= (B) POST GUNA FORM (TAK KENA CORS) =========
+  // FORM POST (tak kena CORS)
   function postForm(payload){
     return new Promise((resolve) => {
-      // iframe hidden supaya page tak lari
       let iframe = document.getElementById("hidden_iframe");
       if(!iframe){
         iframe = document.createElement("iframe");
@@ -94,7 +53,7 @@ h3{margin-top:0}
 
       const input = document.createElement("input");
       input.type = "hidden";
-      input.name = "payload";
+      input.name = "data";              // penting: Apps Script buang "data="
       input.value = JSON.stringify(payload);
       form.appendChild(input);
 
@@ -130,9 +89,9 @@ h3{margin-top:0}
       document.getElementById('sekolahSM').value = "";
       document.getElementById('pg').value = "";
 
-      showMsg("✅ Rekod dihantar. Sila tunggu paparan dikemas kini.", "ok");
-
+      showMsg("✅ Rekod dihantar. Dashboard akan kemas kini.", "ok");
       setTimeout(render, 900);
+
     }catch(err){
       showMsg("❌ Ralat: " + err.message, "err");
       document.getElementById("status").textContent = "Ralat";
@@ -158,6 +117,7 @@ h3{margin-top:0}
       showMsg("⚠️ Tiada data untuk dieksport!", "err");
       return;
     }
+
     let csvContent = "DAERAH,SEKOLAH RENDAH,GURU BESAR,SEKOLAH MENENGAH,PENGETUA,UPDATED_AT\n";
     data.forEach(item => {
       const row = [
@@ -194,9 +154,9 @@ h3{margin-top:0}
 
       if(ppdsFilled.length === 0){
         summaryEmpty.style.display = "block";
-        summaryEmpty.textContent = "Tiada data didaftarkan.";
       }else{
         summaryEmpty.style.display = "none";
+
         ppdsFilled.forEach(ppdName => {
           const entries = data.filter(i => i.ppd === ppdName);
           const card = document.createElement('div');
@@ -234,13 +194,9 @@ h3{margin-top:0}
     AUTO_TIMER = setInterval(render, 8000);
   }
 
-  // mula
   render();
   startAuto();
 </script>
-
-</body>
-</html>
 
 
 
