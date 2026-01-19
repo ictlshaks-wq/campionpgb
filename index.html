@@ -301,6 +301,11 @@
     URL.revokeObjectURL(url);
   }
 
+  function cleanText(v){
+  if(!v) return "-";
+  return decodeURIComponent(String(v).replace(/\+/g, " "));
+}
+
   async function render() {
     const summaryList = document.getElementById('summaryList');
     const summaryEmpty = document.getElementById('summaryEmpty');
@@ -373,3 +378,4 @@
 
 </body>
 </html>
+
