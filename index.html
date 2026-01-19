@@ -1,347 +1,89 @@
+
 <!doctype html>
 <html lang="ms">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
-  <meta name="theme-color" content="#2563eb" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>PENTADBIR CHAMPION PBS PAHANG</title>
-  <style>
-    :root { --bg: #f8fafc; --card: #ffffff; --line: #e2e8f0; --text: #1e293b; --muted: #64748b; --primary: #2563eb; --accent: #f1f5f9; }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 15px; }
-    .container { max-width: 1100px; margin: auto; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
-    h1 { margin: 0 0 4px; font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.2; }
-    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 12px; font-weight: 700; }
-    p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 600; }
-
-    .topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-    .btn-row { display:flex; gap:8px; flex-wrap:wrap; }
-
-    .main-layout { display: grid; gap: 20px; grid-template-columns: 1fr; }
-    @media(min-width: 900px) { .main-layout { grid-template-columns: 1fr 400px; } }
-
-    .form-section { display: grid; gap: 16px; }
-    .input-group { background: var(--accent); padding: 16px; border-radius: 12px; border: 1px solid var(--line); }
-    .input-group h3 { margin: 0 0 12px 0; font-size: 14px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-
-    label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #475569; text-transform: uppercase; }
-    input, select {
-      width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px;
-      font-size: 16px; margin-bottom: 12px; background: white; text-transform: uppercase;
-    }
-    input::placeholder { text-transform: none; }
-    input:last-child { margin-bottom: 0; }
-
-    button { padding: 14px 16px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.2s; }
-    .btn-main { background: #0f172a; color: white; width: 100%; }
-    .btn-main:active { transform: scale(0.98); background: #1e293b; }
-    .btn-ghost {
-      background: transparent; color: var(--muted); border: 1px solid var(--line);
-      padding: 10px 12px; font-size: 12px; font-weight: 700;
-    }
-    .btn-ghost:hover { background:#fff; color: var(--text); border-color: #94a3b8; }
-
-    .btn-export-small {
-      background: transparent; color: var(--muted); border: 1px solid var(--line);
-      padding: 6px 12px; font-size: 11px; font-weight: 600;
-      margin: 20px auto 40px; display: block; width: fit-content;
-    }
-    .btn-export-small:hover { background: #fff; color: var(--text); border-color: var(--muted); }
-
-    .msg { margin-top: 12px; font-size: 13px; font-weight: 600; text-align: center; min-height: 40px; border-radius: 8px; padding: 10px; display: none; }
-    .msg.show { display: block; }
-    .ok { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    .err { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
-    .sidebar { display: flex; flex-direction: column; gap: 16px; }
-    .sidebar-header { border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .sidebar-header h2 { color: var(--primary); margin: 0; font-size: 14px; }
-    .status-pill { font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 999px; border:1px solid var(--line); background:#fff; color:#334155; }
-
-    .summary-list { display: flex; flex-direction: column; gap: 12px; }
-    .summary-card { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 12px; font-size: 13px; position: relative; }
-    .summary-card b.district { color: #0f172a; font-size: 14px; display: block; margin-bottom: 10px; background: #f1f5f9; padding: 6px 10px; border-radius: 8px; text-transform: uppercase; }
-
-    .summary-val { margin-top: 12px; color: #334155; border-left: 3px solid var(--primary); padding-left: 10px; position: relative; }
-    .summary-val small { color: var(--muted); font-size: 10px; display: block; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
-    .summary-val strong { font-size: 13px; color: #0f172a; display: block; line-height: 1.4; text-transform: uppercase; }
-
-    .btn-del-mini {
-      padding: 8px; font-size: 10px; color: #ef4444; background: #fff1f2;
-      border-radius: 6px; border: none; cursor: pointer; position: absolute;
-      top: 10px; right: 10px; font-weight: 900;
-    }
-    .btn-del-mini:active { background: #fecaca; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PENTADBIR CHAMPION PBS PAHANG</title>
+<style>
+body{font-family:Arial;margin:20px}
+input,select,button{width:100%;padding:10px;margin:6px 0}
+.card{border:1px solid #ddd;padding:15px;margin-bottom:15px}
+h3{margin-top:0}
+</style>
 </head>
 <body>
 
-<div class="container">
-  <div class="card">
-    <div class="topbar">
-      <div>
-        <h1>PENTADBIR CHAMPION PBS PAHANG</h1>
-        <p>Sektor Pembelajaran, JPN Pahang 2026</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn-ghost" onclick="manualRefresh()">Refresh</button>
-        <button class="btn-ghost" id="btnAuto" onclick="toggleAuto()">Auto: ON</button>
-      </div>
-    </div>
-  </div>
+<div class="card">
+<h3>ISI DATA</h3>
+<select id="ppd">
+<option value="">-- PPD --</option>
+<option>PPD Kuantan</option>
+<option>PPD Pekan</option>
+<option>PPD Temerloh</option>
+</select>
 
-  <div class="main-layout">
-    <div class="card">
-      <h2>Borang Pendaftaran</h2>
-      <div class="form-section">
-        <div>
-          <label>Pilih Daerah (PPD)</label>
-          <select id="ppd">
-            <option value="">-- Pilih PPD --</option>
-            <option>PPD Kuantan</option>
-            <option>PPD Pekan</option>
-            <option>PPD Rompin</option>
-            <option>PPD Temerloh</option>
-            <option>PPD Bera</option>
-            <option>PPD Maran</option>
-            <option>PPD Bentong</option>
-            <option>PPD Lipis</option>
-            <option>PPD Raub</option>
-            <option>PPD Jerantut</option>
-            <option>PPD Cameron Highlands</option>
-          </select>
-        </div>
+<input id="sr" placeholder="Sekolah Rendah">
+<input id="gb" placeholder="Guru Besar">
+<input id="sm" placeholder="Sekolah Menengah">
+<input id="pg" placeholder="Pengetua">
 
-        <div class="input-group">
-          <h3>🏫 Sekolah Rendah</h3>
-          <label>Nama Sekolah Rendah</label>
-          <input type="text" id="sekolahSR" placeholder="Contoh: SK Pelabuhan">
-          <label>Nama Guru Besar</label>
-          <input type="text" id="gb" placeholder="Nama penuh">
-        </div>
+<button onclick="simpan()">SIMPAN</button>
+<div id="msg"></div>
+</div>
 
-        <div class="input-group">
-          <h3>🏫 Sekolah Menengah</h3>
-          <label>Nama Sekolah Menengah</label>
-          <input type="text" id="sekolahSM" placeholder="Contoh: SMK Pelabuhan">
-          <label>Nama Pengetua</label>
-          <input type="text" id="pg" placeholder="Nama penuh">
-        </div>
-
-        <button class="btn-main" onclick="simpan()">Simpan / Kemaskini Rekod (ikut PPD)</button>
-        <div id="msg" class="msg"></div>
-      </div>
-    </div>
-
-    <div class="sidebar">
-      <div class="card">
-        <div class="sidebar-header">
-          <h2>Senarai Terkini (Live)</h2>
-          <span class="status-pill" id="status">Menghubung…</span>
-        </div>
-
-        <div id="summaryList" class="summary-list"></div>
-        <div id="summaryEmpty" style="font-size: 13px; color: var(--muted); text-align: center; padding: 20px;">
-          Tiada data didaftarkan.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <button class="btn-export-small" onclick="exportCSV()">Eksport Data (CSV)</button>
+<div class="card">
+<h3>DASHBOARD</h3>
+<div id="list">Loading…</div>
 </div>
 
 <script>
-  // ======= WAJIB TUKAR URL INI =======
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt5cE4h8orcUxy5B9R_vN4L6-3jfnSQXLQooQLCfs7Uvz277HvgByEElskezWgxKkEww/exec"; // contoh: https://script.google.com/macros/s/AKfycbxxxx/exec
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt5cE4h8orcUxy5B9R_vN4L6-3jfnSQXLQooQLCfs7Uvz277HvgByEElskezWgxKkEww/exec";
 
-  let CACHE = [];         // simpan data terakhir untuk export CSV
-  let AUTO_ON = true;
-  let AUTO_TIMER = null;
+// ===== POST (FORM – NO CORS) =====
+function simpan(){
+  const data = {
+    ppd:ppd.value,
+    sekolahSR:sr.value,
+    gb:gb.value,
+    sekolahSM:sm.value,
+    pg:pg.value
+  };
 
-  function showMsg(text, type) {
-    const msg = document.getElementById('msg');
-    msg.textContent = text;
-    msg.className = `msg show ${type}`;
-    setTimeout(() => { msg.className = "msg"; }, 4000);
-  }
+  const f = document.createElement("form");
+  f.method="POST";
+  f.action=WEB_APP_URL;
+  f.enctype="text/plain";
 
-  async function apiGetAll() {
-    const res = await fetch(WEB_APP_URL, { method: "GET" });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message || "Gagal ambil data");
-    return json.data || [];
-  }
+  const t=document.createElement("textarea");
+  t.name="data";
+  t.value=JSON.stringify(data);
+  f.appendChild(t);
 
-  async function apiUpsert(payload) {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "upsert", ...payload })
-    });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message || "Gagal simpan");
-    return json;
-  }
+  document.body.appendChild(f);
+  f.submit();
+  document.body.removeChild(f);
 
-  async function apiDelete(ppd) {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", ppd })
-    });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message || "Gagal padam");
-    return json;
-  }
+  msg.innerHTML="✔ Data dihantar";
+  setTimeout(load,1000);
+}
 
-  async function simpan() {
-    const ppd = document.getElementById('ppd').value.trim();
-    const sekolahSR = document.getElementById('sekolahSR').value.trim().toUpperCase();
-    const gb = document.getElementById('gb').value.trim().toUpperCase();
-    const sekolahSM = document.getElementById('sekolahSM').value.trim().toUpperCase();
-    const pg = document.getElementById('pg').value.trim().toUpperCase();
+// ===== GET (JSONP – NO CORS) =====
+function load(){
+  const cb="cb"+Date.now();
+  window[cb]=res=>{
+    list.innerHTML=res.data.map(r=>
+      `<p><b>${r.ppd}</b><br>
+      ${r.sekolahSR} – ${r.gb}<br>
+      ${r.sekolahSM} – ${r.pg}</p>`
+    ).join("");
+  };
+  const s=document.createElement("script");
+  s.src=WEB_APP_URL+"?callback="+cb;
+  document.body.appendChild(s);
+}
 
-    if(!ppd || !sekolahSR || !gb || !sekolahSM || !pg) {
-      showMsg("⚠️ Sila isi semua ruangan!", "err");
-      return;
-    }
-
-    try{
-      document.getElementById("status").textContent = "Menyimpan…";
-      const out = await apiUpsert({ ppd, sekolahSR, gb, sekolahSM, pg });
-
-      document.getElementById('sekolahSR').value = "";
-      document.getElementById('gb').value = "";
-      document.getElementById('sekolahSM').value = "";
-      document.getElementById('pg').value = "";
-
-      showMsg("✅ " + out.message, "ok");
-      await render();
-    }catch(err){
-      showMsg("❌ Ralat: " + err.message, "err");
-      document.getElementById("status").textContent = "Ralat";
-    }
-  }
-
-  async function deletePPD(ppd) {
-    if(!confirm(`Padam rekod untuk ${ppd}?`)) return;
-    try{
-      document.getElementById("status").textContent = "Memadam…";
-      const out = await apiDelete(ppd);
-      showMsg("🗑️ " + out.message, "ok");
-      await render();
-    }catch(err){
-      showMsg("❌ Ralat padam: " + err.message, "err");
-      document.getElementById("status").textContent = "Ralat";
-    }
-  }
-
-  function exportCSV() {
-    const data = CACHE || [];
-    if (data.length === 0) {
-      showMsg("⚠️ Tiada data untuk dieksport!", "err");
-      return;
-    }
-
-    let csvContent = "DAERAH,SEKOLAH RENDAH,GURU BESAR,SEKOLAH MENENGAH,PENGETUA,UPDATED_AT\n";
-    data.forEach(item => {
-      const row = [
-        item.ppd || "",
-        item.sekolahSR || "",
-        item.gb || "",
-        item.sekolahSM || "",
-        item.pg || "",
-        item.updatedAt || ""
-      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
-      csvContent += row + "\n";
-    });
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `pendaftaran-champion-pbs-${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async function render() {
-    const summaryList = document.getElementById('summaryList');
-    const summaryEmpty = document.getElementById('summaryEmpty');
-
-    try{
-      document.getElementById("status").textContent = "Mengambil data…";
-      const data = await apiGetAll();
-      CACHE = data;
-
-      summaryList.innerHTML = "";
-      const ppdsFilled = [...new Set(data.map(i => (i.ppd || "").toString().trim()).filter(Boolean))].sort();
-
-      if(ppdsFilled.length === 0) {
-        summaryEmpty.style.display = "block";
-        summaryEmpty.textContent = "Tiada data didaftarkan.";
-      } else {
-        summaryEmpty.style.display = "none";
-
-        ppdsFilled.forEach(ppdName => {
-          const entries = data.filter(i => i.ppd === ppdName);
-
-          const card = document.createElement('div');
-          card.className = "summary-card";
-
-          // 1 rekod per PPD (tetapi kalau ada lebih, tetap papar semua)
-          let schoolsHtml = entries.map(e => `
-            <div class="summary-val">
-              <button class="btn-del-mini" onclick="deletePPD('${ppdName.replace(/'/g, "\\'")}')">Padam</button>
-              <small>${(e.sekolahSR || "-")}</small>
-              <strong>GB: ${(e.gb || "-")}</strong>
-              <small style="margin-top:8px">${(e.sekolahSM || "-")}</small>
-              <strong>PG: ${(e.pg || "-")}</strong>
-              <small style="margin-top:10px">KEMASKINI: ${(e.updatedAt || "-")}</small>
-            </div>
-          `).join('');
-
-          card.innerHTML = `<b class="district">📍 ${ppdName}</b>${schoolsHtml}`;
-          summaryList.appendChild(card);
-        });
-      }
-
-      document.getElementById("status").textContent = "Live";
-    }catch(err){
-      summaryList.innerHTML = "";
-      summaryEmpty.style.display = "block";
-      summaryEmpty.textContent = "Ralat ambil data: " + err.message;
-      document.getElementById("status").textContent = "Ralat";
-    }
-  }
-
-  function manualRefresh(){
-    render();
-  }
-
-  function startAuto(){
-    stopAuto();
-    AUTO_TIMER = setInterval(render, 8000); // 8 saat
-  }
-
-  function stopAuto(){
-    if(AUTO_TIMER) clearInterval(AUTO_TIMER);
-    AUTO_TIMER = null;
-  }
-
-  function toggleAuto(){
-    AUTO_ON = !AUTO_ON;
-    document.getElementById("btnAuto").textContent = AUTO_ON ? "Auto: ON" : "Auto: OFF";
-    if(AUTO_ON) startAuto(); else stopAuto();
-  }
-
-  // mula
-  render();
-  startAuto();
+load();
 </script>
 
 </body>
