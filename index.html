@@ -334,9 +334,9 @@
               <button class="btn-del-mini" onclick="deletePPD('${ppdName.replace(/'/g, "\\'")}')">Padam</button>
               <small>${(e.sekolahSR || "-")}</small>
               <strong>GB: ${(e.gb || "-")}</strong>
-              <small style="margin-top:8px">${(e.sekolahSM || "-")}</small>
-              <strong>PG: ${(e.pg || "-")}</strong>
-              <small style="margin-top:10px">KEMASKINI: ${(e.updatedAt || "-")}</small>
+              <small style="margin-top:8px">${cleanText(e.sekolahSM)}</small>
+<strong>PG: ${cleanText(e.pg)}</strong>
+<small style="margin-top:10px">KEMASKINI: ${cleanText(e.updatedAt)}</small>
             </div>
           `).join('');
 
@@ -378,4 +378,5 @@
 
 </body>
 </html>
+
 
