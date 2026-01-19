@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>PENTADBIR CHAMPION PBS PAHANG</title>
+
   <style>
     :root { --bg: #f8fafc; --card: #ffffff; --line: #e2e8f0; --text: #1e293b; --muted: #64748b; --primary: #2563eb; --accent: #f1f5f9; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -75,10 +76,12 @@
       top: 10px; right: 10px; font-weight: 900;
     }
     .btn-del-mini:active { background: #fecaca; }
+
+    .hint { font-size:12px; color:#64748b; margin-top:-6px; margin-bottom:12px; }
   </style>
 </head>
-<body>
 
+<body>
 <div class="container">
   <div class="card">
     <div class="topbar">
@@ -113,6 +116,7 @@
             <option>PPD Jerantut</option>
             <option>PPD Cameron Highlands</option>
           </select>
+          <div class="hint">* Sistem akan halang PPD yang sudah wujud (tak boleh overwrite).</div>
         </div>
 
         <div class="input-group">
@@ -154,133 +158,172 @@
   <button class="btn-export-small" onclick="exportCSV()">Eksport Data (CSV)</button>
 </div>
 
+<!-- iframe tersembunyi untuk POST tanpa CORS -->
+<iframe id="hidden_iframe" name="hidden_iframe" style="display:none"></iframe>
+
 <script>
-  // =========================
-  //  WAJIB TUKAR URL /exec
-  // =========================
+  // =============================
+  // 1) URL WEB APP /exec
+  // =============================
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt5cE4h8orcUxy5B9R_vN4L6-3jfnSQXLQooQLCfs7Uvz277HvgByEElskezWgxKkEww/exec";
 
-  let CACHE = [];
+  let CACHE = [];                 // data terkini (untuk export CSV)
+  let PPD_SET = new Set();        // untuk halang PPD sama
   let AUTO_ON = true;
   let AUTO_TIMER = null;
 
-  // =========================
-  //  Helper: buang + & kemas ruang
-  // =========================
-  function niceText(v){
-    return String(v || "")
-      .replace(/\+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-  function samePPD(a, b){
-    return niceText(a).toUpperCase() === niceText(b).toUpperCase();
-  }
-
+  // =============================
+  // UTIL: Papar mesej
+  // =============================
   function showMsg(text, type) {
     const msg = document.getElementById('msg');
     msg.textContent = text;
     msg.className = `msg show ${type}`;
-    setTimeout(() => { msg.className = "msg"; }, 4000);
+    setTimeout(() => { msg.className = "msg"; }, 4500);
   }
 
-  // =========================
-  //  API (GET/POST JSON)
-  // =========================
-  async function apiGetAll() {
-    const res = await fetch(WEB_APP_URL, { method: "GET" });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message || "Gagal ambil data");
-    return json.data || [];
+  // =============================
+  // UTIL: Buang + / decode URL
+  // (selesaikan AHMAD+BUSHRA dll)
+  // =============================
+  function niceText(v){
+    let s = String(v ?? "");
+    // decode %2B / %20 kalau ada
+    try { s = decodeURIComponent(s); } catch(e) {}
+    // tukar + jadi space
+    s = s.replace(/\+/g, " ");
+    // kemas space
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
   }
 
-  async function apiUpsert(payload) {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "upsert", ...payload })
+  // =============================
+  // 2) GET JSONP (tak kena CORS)
+  // Apps Script mesti sokong ?callback=
+  // =============================
+  function apiGetAllJSONP(){
+    return new Promise((resolve, reject) => {
+      const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1000);
+
+      window[cb] = (payload) => {
+        try { delete window[cb]; script.remove(); } catch(e){}
+        if(!payload || payload.ok !== true) return reject(new Error(payload?.message || "Gagal ambil data"));
+        resolve(payload.data || []);
+      };
+
+      const script = document.createElement("script");
+      script.onerror = () => {
+        try { delete window[cb]; script.remove(); } catch(e){}
+        reject(new Error("Gagal ambil data (JSONP). Semak doGet Apps Script."));
+      };
+
+      script.src = WEB_APP_URL + "?callback=" + encodeURIComponent(cb) + "&ts=" + Date.now();
+      document.body.appendChild(script);
     });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message || "Gagal simpan");
-    return json;
   }
 
-  async function apiDelete(ppd) {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", ppd })
+  // =============================
+  // 3) POST FORM (tak kena CORS)
+  // Apps Script terima parameter data=JSON
+  // =============================
+  function postForm(payload){
+    return new Promise((resolve) => {
+      let iframe = document.getElementById("hidden_iframe");
+      if(!iframe){
+        iframe = document.createElement("iframe");
+        iframe.name = "hidden_iframe";
+        iframe.id = "hidden_iframe";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = WEB_APP_URL;
+      form.target = "hidden_iframe";
+      form.enctype = "application/x-www-form-urlencoded";
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "data";
+      input.value = JSON.stringify(payload);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        try { form.remove(); } catch(e){}
+        resolve(true);
+      }, 350);
     });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message || "Gagal padam");
-    return json;
   }
 
-  // =========================
-  //  SIMPAN (SEKAT PPD SAMA)
-  // =========================
+  // =============================
+  // 4) SIMPAN (halang PPD sama)
+  // =============================
   async function simpan() {
-    const ppd = document.getElementById('ppd').value.trim();
-    const sekolahSR = document.getElementById('sekolahSR').value.trim().toUpperCase();
-    const gb = document.getElementById('gb').value.trim().toUpperCase();
-    const sekolahSM = document.getElementById('sekolahSM').value.trim().toUpperCase();
-    const pg = document.getElementById('pg').value.trim().toUpperCase();
+    const ppdRaw = document.getElementById('ppd').value.trim();
+    const ppd = niceText(ppdRaw).toUpperCase();
+
+    const sekolahSR = niceText(document.getElementById('sekolahSR').value).toUpperCase();
+    const gb = niceText(document.getElementById('gb').value).toUpperCase();
+    const sekolahSM = niceText(document.getElementById('sekolahSM').value).toUpperCase();
+    const pg = niceText(document.getElementById('pg').value).toUpperCase();
 
     if(!ppd || !sekolahSR || !gb || !sekolahSM || !pg) {
       showMsg("⚠️ Sila isi semua ruangan!", "err");
       return;
     }
 
+    // HALANG PPD SAMA (tidak overwrite)
+    if (PPD_SET.has(ppd)) {
+      showMsg("⚠️ PPD ini sudah wujud. Sistem tidak benarkan PPD sama dimasukkan semula.", "err");
+      return;
+    }
+
     try{
-      document.getElementById("status").textContent = "Semak PPD…";
-
-      // Ambil data semasa untuk sekat PPD sama
-      const current = await apiGetAll();
-      const exists = current.some(row => samePPD(row.ppd, ppd));
-
-      if (exists) {
-        document.getElementById("status").textContent = "Live";
-        showMsg(`❌ ${ppd} sudah didaftarkan. Sila padam rekod lama di dashboard jika ingin tukar.`, "err");
-        return;
-      }
-
       document.getElementById("status").textContent = "Menyimpan…";
-      const out = await apiUpsert({ ppd, sekolahSR, gb, sekolahSM, pg });
 
+      await postForm({ action:"upsert", ppd, sekolahSR, gb, sekolahSM, pg });
+
+      // kosongkan borang
       document.getElementById('sekolahSR').value = "";
       document.getElementById('gb').value = "";
       document.getElementById('sekolahSM').value = "";
       document.getElementById('pg').value = "";
 
-      showMsg("✅ " + (out.message || "Rekod berjaya disimpan!"), "ok");
-      await render();
+      showMsg("✅ Rekod dihantar. Dashboard akan kemas kini.", "ok");
+
+      // beri masa Apps Script tulis ke Sheet
+      setTimeout(render, 900);
     }catch(err){
       showMsg("❌ Ralat: " + err.message, "err");
       document.getElementById("status").textContent = "Ralat";
     }
   }
 
-  // =========================
-  //  PADAM
-  // =========================
-  async function deletePPD(ppdNameRaw) {
-    const ppdName = ppdNameRaw; // yang dipapar dah cantik, tapi kita hantar ikut nilai paparan
-    if(!confirm(`Padam rekod untuk ${ppdName}?`)) return;
+  // =============================
+  // 5) PADAM PPD
+  // =============================
+  async function deletePPD(ppdName) {
+    const ppd = niceText(ppdName).toUpperCase();
+    if(!confirm(`Padam rekod untuk ${ppd}?`)) return;
 
     try{
       document.getElementById("status").textContent = "Memadam…";
-      const out = await apiDelete(ppdName);
-      showMsg("🗑️ " + (out.message || "Rekod dipadam."), "ok");
-      await render();
+      await postForm({ action:"delete", ppd });
+      showMsg("🗑️ Permintaan padam dihantar.", "ok");
+      setTimeout(render, 900);
     }catch(err){
       showMsg("❌ Ralat padam: " + err.message, "err");
       document.getElementById("status").textContent = "Ralat";
     }
   }
 
-  // =========================
-  //  EXPORT CSV
-  // =========================
+  // =============================
+  // 6) EXPORT CSV (tanpa +)
+  // =============================
   function exportCSV() {
     const data = CACHE || [];
     if (data.length === 0) {
@@ -310,24 +353,26 @@
     URL.revokeObjectURL(url);
   }
 
-  // =========================
-  //  RENDER (BUANG + DI PAPARAN)
-  // =========================
+  // =============================
+  // 7) RENDER DASHBOARD (buang +)
+  // =============================
   async function render() {
     const summaryList = document.getElementById('summaryList');
     const summaryEmpty = document.getElementById('summaryEmpty');
 
     try{
       document.getElementById("status").textContent = "Mengambil data…";
-      const data = await apiGetAll();
+
+      const data = await apiGetAllJSONP();
+
+      // simpan cache & set PPD
       CACHE = data;
+      PPD_SET = new Set(
+        data.map(i => niceText(i.ppd || "").toUpperCase()).filter(Boolean)
+      );
 
       summaryList.innerHTML = "";
-
-      // PPD list (kemas + buang + semasa sorting/papar)
-      const ppdsFilled = [...new Set(
-        data.map(i => niceText(i.ppd)).filter(Boolean)
-      )].sort((a,b) => a.localeCompare(b, "ms"));
+      const ppdsFilled = [...PPD_SET].sort();
 
       if(ppdsFilled.length === 0) {
         summaryEmpty.style.display = "block";
@@ -336,24 +381,27 @@
         summaryEmpty.style.display = "none";
 
         ppdsFilled.forEach(ppdName => {
-          // padankan rekod ikut PPD (banding versi kemas)
-          const entries = data.filter(i => samePPD(i.ppd, ppdName));
+          const entries = data.filter(i => niceText(i.ppd || "").toUpperCase() === ppdName);
 
           const card = document.createElement('div');
           card.className = "summary-card";
 
+          // Papar semua rekod bawah PPD (kalau ada lebih 1)
           const schoolsHtml = entries.map(e => `
             <div class="summary-val">
-              <button class="btn-del-mini" onclick="deletePPD('${ppdName.replace(/'/g, "\\'")}')">Padam</button>
+              <button class="btn-del-mini" onclick="deletePPD('${String(ppdName).replace(/'/g, "\\'")}')">Padam</button>
+
               <small>${niceText(e.sekolahSR || "-")}</small>
               <strong>GB: ${niceText(e.gb || "-")}</strong>
+
               <small style="margin-top:8px">${niceText(e.sekolahSM || "-")}</small>
               <strong>PG: ${niceText(e.pg || "-")}</strong>
+
               <small style="margin-top:10px">KEMASKINI: ${niceText(e.updatedAt || "-")}</small>
             </div>
           `).join('');
 
-          card.innerHTML = `<b class="district">📍 ${ppdName}</b>${schoolsHtml}`;
+          card.innerHTML = `<b class="district">📍 ${niceText(ppdName)}</b>${schoolsHtml}`;
           summaryList.appendChild(card);
         });
       }
@@ -367,9 +415,7 @@
     }
   }
 
-  function manualRefresh(){
-    render();
-  }
+  function manualRefresh(){ render(); }
 
   function startAuto(){
     stopAuto();
@@ -394,6 +440,3 @@
 
 </body>
 </html>
-
-
-
