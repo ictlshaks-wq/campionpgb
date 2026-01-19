@@ -38,55 +38,209 @@ h3{margin-top:0}
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt5cE4h8orcUxy5B9R_vN4L6-3jfnSQXLQooQLCfs7Uvz277HvgByEElskezWgxKkEww/exec";
+  // ======= URL /exec tuan (yang betul) =======
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzt5cE4h8orcUxy5B9R_vN4L6-3jfnSQXLQooQLCfs7Uvz277HvgByEElskezWgxKkEww/exec";
 
-// ===== POST (FORM – NO CORS) =====
-function simpan(){
-  const data = {
-    ppd:ppd.value,
-    sekolahSR:sr.value,
-    gb:gb.value,
-    sekolahSM:sm.value,
-    pg:pg.value
-  };
+  let CACHE = [];
+  let AUTO_TIMER = null;
 
-  const f = document.createElement("form");
-  f.method="POST";
-  f.action=WEB_APP_URL;
-  f.enctype="text/plain";
+  function showMsg(text, type) {
+    const msg = document.getElementById('msg');
+    msg.textContent = text;
+    msg.className = `msg show ${type}`;
+    setTimeout(() => { msg.className = "msg"; }, 4000);
+  }
 
-  const t=document.createElement("textarea");
-  t.name="data";
-  t.value=JSON.stringify(data);
-  f.appendChild(t);
+  // ========= (A) GET GUNA JSONP (TAK KENA CORS) =========
+  function apiGetAllJSONP(){
+    return new Promise((resolve, reject) => {
+      const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1000);
 
-  document.body.appendChild(f);
-  f.submit();
-  document.body.removeChild(f);
+      window[cb] = (payload) => {
+        try { delete window[cb]; script.remove(); } catch(e){}
+        if(!payload || payload.ok !== true) return reject(new Error(payload?.message || "Gagal ambil data"));
+        resolve(payload.data || []);
+      };
 
-  msg.innerHTML="✔ Data dihantar";
-  setTimeout(load,1000);
-}
+      const script = document.createElement("script");
+      script.onerror = () => {
+        try { delete window[cb]; script.remove(); } catch(e){}
+        reject(new Error("Gagal muat data (JSONP error)."));
+      };
 
-// ===== GET (JSONP – NO CORS) =====
-function load(){
-  const cb="cb"+Date.now();
-  window[cb]=res=>{
-    list.innerHTML=res.data.map(r=>
-      `<p><b>${r.ppd}</b><br>
-      ${r.sekolahSR} – ${r.gb}<br>
-      ${r.sekolahSM} – ${r.pg}</p>`
-    ).join("");
-  };
-  const s=document.createElement("script");
-  s.src=WEB_APP_URL+"?callback="+cb;
-  document.body.appendChild(s);
-}
+      script.src = `${WEB_APP_URL}?callback=${encodeURIComponent(cb)}&ts=${Date.now()}`;
+      document.body.appendChild(script);
+    });
+  }
 
-load();
+  // ========= (B) POST GUNA FORM (TAK KENA CORS) =========
+  function postForm(payload){
+    return new Promise((resolve) => {
+      // iframe hidden supaya page tak lari
+      let iframe = document.getElementById("hidden_iframe");
+      if(!iframe){
+        iframe = document.createElement("iframe");
+        iframe.name = "hidden_iframe";
+        iframe.id = "hidden_iframe";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = WEB_APP_URL;
+      form.target = "hidden_iframe";
+      form.enctype = "application/x-www-form-urlencoded";
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "payload";
+      input.value = JSON.stringify(payload);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        try { form.remove(); } catch(e){}
+        resolve(true);
+      }, 350);
+    });
+  }
+
+  async function simpan() {
+    const ppd = document.getElementById('ppd').value.trim();
+    const sekolahSR = document.getElementById('sekolahSR').value.trim().toUpperCase();
+    const gb = document.getElementById('gb').value.trim().toUpperCase();
+    const sekolahSM = document.getElementById('sekolahSM').value.trim().toUpperCase();
+    const pg = document.getElementById('pg').value.trim().toUpperCase();
+
+    if(!ppd || !sekolahSR || !gb || !sekolahSM || !pg) {
+      showMsg("⚠️ Sila isi semua ruangan!", "err");
+      return;
+    }
+
+    try{
+      document.getElementById("status").textContent = "Menyimpan…";
+
+      await postForm({ action:"upsert", ppd, sekolahSR, gb, sekolahSM, pg });
+
+      document.getElementById('sekolahSR').value = "";
+      document.getElementById('gb').value = "";
+      document.getElementById('sekolahSM').value = "";
+      document.getElementById('pg').value = "";
+
+      showMsg("✅ Rekod dihantar. Sila tunggu paparan dikemas kini.", "ok");
+
+      setTimeout(render, 900);
+    }catch(err){
+      showMsg("❌ Ralat: " + err.message, "err");
+      document.getElementById("status").textContent = "Ralat";
+    }
+  }
+
+  async function deletePPD(ppd) {
+    if(!confirm(`Padam rekod untuk ${ppd}?`)) return;
+    try{
+      document.getElementById("status").textContent = "Memadam…";
+      await postForm({ action:"delete", ppd });
+      showMsg("🗑️ Rekod dihantar untuk dipadam.", "ok");
+      setTimeout(render, 900);
+    }catch(err){
+      showMsg("❌ Ralat padam: " + err.message, "err");
+      document.getElementById("status").textContent = "Ralat";
+    }
+  }
+
+  function exportCSV() {
+    const data = CACHE || [];
+    if (data.length === 0) {
+      showMsg("⚠️ Tiada data untuk dieksport!", "err");
+      return;
+    }
+    let csvContent = "DAERAH,SEKOLAH RENDAH,GURU BESAR,SEKOLAH MENENGAH,PENGETUA,UPDATED_AT\n";
+    data.forEach(item => {
+      const row = [
+        item.ppd || "",
+        item.sekolahSR || "",
+        item.gb || "",
+        item.sekolahSM || "",
+        item.pg || "",
+        item.updatedAt || ""
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
+      csvContent += row + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pendaftaran-champion-pbs-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function render() {
+    const summaryList = document.getElementById('summaryList');
+    const summaryEmpty = document.getElementById('summaryEmpty');
+
+    try{
+      document.getElementById("status").textContent = "Mengambil data…";
+      const data = await apiGetAllJSONP();
+      CACHE = data;
+
+      summaryList.innerHTML = "";
+      const ppdsFilled = [...new Set(data.map(i => (i.ppd||"").toString().trim()).filter(Boolean))].sort();
+
+      if(ppdsFilled.length === 0){
+        summaryEmpty.style.display = "block";
+        summaryEmpty.textContent = "Tiada data didaftarkan.";
+      }else{
+        summaryEmpty.style.display = "none";
+        ppdsFilled.forEach(ppdName => {
+          const entries = data.filter(i => i.ppd === ppdName);
+          const card = document.createElement('div');
+          card.className = "summary-card";
+
+          const schoolsHtml = entries.map(e => `
+            <div class="summary-val">
+              <button class="btn-del-mini" onclick="deletePPD('${ppdName.replace(/'/g, "\\'")}')">Padam</button>
+              <small>${(e.sekolahSR || "-")}</small>
+              <strong>GB: ${(e.gb || "-")}</strong>
+              <small style="margin-top:8px">${(e.sekolahSM || "-")}</small>
+              <strong>PG: ${(e.pg || "-")}</strong>
+              <small style="margin-top:10px">KEMASKINI: ${(e.updatedAt || "-")}</small>
+            </div>
+          `).join("");
+
+          card.innerHTML = `<b class="district">📍 ${ppdName}</b>${schoolsHtml}`;
+          summaryList.appendChild(card);
+        });
+      }
+
+      document.getElementById("status").textContent = "Live";
+    }catch(err){
+      summaryList.innerHTML = "";
+      summaryEmpty.style.display = "block";
+      summaryEmpty.textContent = "Ralat ambil data: " + err.message;
+      document.getElementById("status").textContent = "Ralat";
+    }
+  }
+
+  function manualRefresh(){ render(); }
+
+  function startAuto(){
+    if(AUTO_TIMER) clearInterval(AUTO_TIMER);
+    AUTO_TIMER = setInterval(render, 8000);
+  }
+
+  // mula
+  render();
+  startAuto();
 </script>
 
 </body>
 </html>
+
 
 
