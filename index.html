@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PENTADBIR CHAMPION PBS PAHANG</title>
+  <style>
+    :root { --bg: #f8fafc; --card: #ffffff; --line: #e2e8f0; --text: #1e293b; --muted: #64748b; --primary: #2563eb; --accent: #f1f5f9; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 15px; }
+    .container { max-width: 1100px; margin: auto; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
+    h1 { margin: 0 0 4px; font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.2; }
+    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 12px; font-weight: 700; }
+    p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 600; }
+    
+    .main-layout { display: grid; gap: 20px; grid-template-columns: 1fr; }
+    @media(min-width: 900px) { .main-layout { grid-template-columns: 1fr 400px; } }
+    
+    .form-section { display: grid; gap: 16px; }
+    .input-group { background: var(--accent); padding: 16px; border-radius: 12px; border: 1px solid var(--line); }
+    .input-group h3 { margin: 0 0 12px 0; font-size: 14px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    
+    label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #475569; text-transform: uppercase; }
+    input, select { 
+      width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px; 
+      font-size: 16px; 
+      margin-bottom: 12px; background: white; 
+      text-transform: uppercase; 
+    }
+    input::placeholder { text-transform: none; }
+    input:last-child { margin-bottom: 0; }
+    
+    button { padding: 14px 16px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-main { background: #0f172a; color: white; width: 100%; }
+    .btn-main:active { transform: scale(0.98); background: #1e293b; }
+    
+    .btn-export-small { 
+      background: transparent; color: var(--muted); border: 1px solid var(--line); 
+      padding: 6px 12px; font-size: 11px; font-weight: 600; 
+      margin: 20px auto 40px; display: block; width: fit-content;
+    }
+    .btn-export-small:hover { background: #fff; color: var(--text); border-color: var(--muted); }
+
+    .msg { margin-top: 12px; font-size: 13px; font-weight: 600; text-align: center; min-height: 40px; border-radius: 8px; padding: 10px; display: none; }
+    .msg.show { display: block; }
+    .ok { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .err { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-header { border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 12px; }
+    .sidebar-header h2 { color: var(--primary); margin: 0; font-size: 14px; }
+    .summary-list { display: flex; flex-direction: column; gap: 12px; }
+    .summary-card { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 12px; font-size: 13px; position: relative; }
+    .summary-card b.district { color: #0f172a; font-size: 14px; display: block; margin-bottom: 10px; background: #f1f5f9; padding: 6px 10px; border-radius: 8px; text-transform: uppercase; }
+    .summary-val { margin-top: 12px; color: #334155; border-left: 3px solid var(--primary); padding-left: 10px; position: relative; }
+    .summary-val small { color: var(--muted); font-size: 10px; display: block; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+    .summary-val strong { font-size: 13px; color: #0f172a; display: block; line-height: 1.4; text-transform: uppercase; }
+    
+    .btn-del-mini { 
+      padding: 8px; font-size: 10px; color: #ef4444; background: #fff1f2; 
+      border-radius: 6px; border: none; cursor: pointer; position: absolute; 
+      top: 10px; right: 10px; font-weight: 700; 
+    }
+    .btn-del-mini:active { background: #fecaca; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h1>PENTADBIR CHAMPION PBS PAHANG</h1>
+    <p>Sektor Pembelajaran, JPN Pahang 2026</p>
+  </div>
+
+  <div class="main-layout">
+    <div class="card">
+      <h2>Borang Pendaftaran</h2>
+      <div class="form-section">
+        <div>
+          <label>Pilih Daerah (PPD)</label>
+          <select id="ppd">
+            <option value="">-- Pilih PPD --</option>
+            <option>PPD Kuantan</option>
+            <option>PPD Pekan</option>
+            <option>PPD Rompin</option>
+            <option>PPD Temerloh</option>
+            <option>PPD Bera</option>
+            <option>PPD Maran</option>
+            <option>PPD Bentong</option>
+            <option>PPD Lipis</option>
+            <option>PPD Raub</option>
+            <option>PPD Jerantut</option>
+            <option>PPD Cameron Highlands</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <h3>🏫 Sekolah Rendah</h3>
+          <label>Nama Sekolah Rendah</label>
+          <input type="text" id="sekolahSR" placeholder="Contoh: SK Pelabuhan">
+          <label>Nama Guru Besar</label>
+          <input type="text" id="gb" placeholder="Nama penuh">
+        </div>
+
+        <div class="input-group">
+          <h3>🏫 Sekolah Menengah</h3>
+          <label>Nama Sekolah Menengah</label>
+          <input type="text" id="sekolahSM" placeholder="Contoh: SMK Pelabuhan">
+          <label>Nama Pengetua</label>
+          <input type="text" id="pg" placeholder="Nama penuh">
+        </div>
+
+        <button class="btn-main" onclick="simpan()">Simpan Rekod</button>
+        <div id="msg" class="msg"></div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="sidebar-header">
+          <h2>Sektor Pembelajaran, JPN Pahang 2026</h2>
+        </div>
+        <div id="summaryList" class="summary-list"></div>
+        <div id="summaryEmpty" style="font-size: 13px; color: var(--muted); text-align: center; padding: 20px;">
+          Tiada data didaftarkan.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Butang Eksport Kecil di Bawah -->
+  <button class="btn-export-small" onclick="exportCSV()">Eksport Data (CSV)</button>
+</div>
+
+<script>
+  const STORAGE_KEY = "ppd_champion_pbs_v4";
+
+  function loadData() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  }
+
+  function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function showMsg(text, type) {
+    const msg = document.getElementById('msg');
+    msg.textContent = text;
+    msg.className = `msg show ${type}`;
+    setTimeout(() => { msg.className = "msg"; }, 4000);
+  }
+
+  function simpan() {
+    const ppd = document.getElementById('ppd').value;
+    const sekolahSR = document.getElementById('sekolahSR').value.trim().toUpperCase();
+    const gb = document.getElementById('gb').value.trim().toUpperCase();
+    const sekolahSM = document.getElementById('sekolahSM').value.trim().toUpperCase();
+    const pg = document.getElementById('pg').value.trim().toUpperCase();
+
+    if(!ppd || !sekolahSR || !gb || !sekolahSM || !pg) {
+      showMsg("⚠️ Sila isi semua ruangan!", "err");
+      return;
+    }
+
+    const data = loadData();
+    const exists = data.some(item => item.ppd === ppd);
+    if(exists) {
+      showMsg(`❌ ${ppd} sudah didaftarkan. Sila padam rekod lama di bahagian tepi jika ingin menukar.`, "err");
+      return;
+    }
+
+    data.push({ id: Date.now(), ppd, sekolahSR, gb, sekolahSM, pg });
+    saveData(data);
+    
+    document.getElementById('sekolahSR').value = "";
+    document.getElementById('gb').value = "";
+    document.getElementById('sekolahSM').value = "";
+    document.getElementById('pg').value = "";
+    
+    showMsg("✅ Rekod berjaya disimpan!", "ok");
+    render();
+  }
+
+  function deleteItem(id) {
+    if(!confirm("Padam rekod ini?")) return;
+    let data = loadData();
+    data = data.filter(item => item.id !== id);
+    saveData(data);
+    render();
+    showMsg("🗑️ Rekod telah dipadam.", "ok");
+  }
+
+  function exportCSV() {
+    const data = loadData();
+    if (data.length === 0) {
+      showMsg("⚠️ Tiada data untuk dieksport!", "err");
+      return;
+    }
+
+    let csvContent = "DAERAH,SEKOLAH RENDAH,GURU BESAR,SEKOLAH MENENGAH,PENGETUA\n";
+    data.forEach(item => {
+      const row = [
+        item.ppd,
+        item.sekolahSR,
+        item.gb,
+        item.sekolahSM,
+        item.pg
+      ].map(v => `"${v.replace(/"/g, '""')}"`).join(",");
+      csvContent += row + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pendaftaran-champion-pbs-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function render() {
+    const data = loadData();
+    const summaryList = document.getElementById('summaryList');
+    const summaryEmpty = document.getElementById('summaryEmpty');
+
+    summaryList.innerHTML = "";
+    const ppdsFilled = [...new Set(data.map(i => i.ppd))].sort();
+    
+    if(ppdsFilled.length === 0) {
+      summaryEmpty.style.display = "block";
+    } else {
+      summaryEmpty.style.display = "none";
+      ppdsFilled.forEach(ppdName => {
+        const entries = data.filter(i => i.ppd === ppdName);
+        const card = document.createElement('div');
+        card.className = "summary-card";
+        
+        let schoolsHtml = entries.map(e => `
+          <div class="summary-val">
+            <button class="btn-del-mini" onclick="deleteItem(${e.id})">Padam</button>
+            <small>${e.sekolahSR}</small>
+            <strong>GB: ${e.gb}</strong>
+            <small style="margin-top:8px">${e.sekolahSM}</small>
+            <strong>PG: ${e.pg}</strong>
+          </div>
+        `).join('');
+
+        card.innerHTML = `<b class="district">📍 ${ppdName}</b>${schoolsHtml}`;
+        summaryList.appendChild(card);
+      });
+    }
+  }
+
+  render();
+</script>
+
+</body>
+</html>
